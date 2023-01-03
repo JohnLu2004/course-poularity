@@ -70,7 +70,7 @@ def crawl():
 
     for i in range(0,len(firstYearCoursesArray)):
         courseEnrolmentDictionary[firstYearCoursesArray[i]] = firstYearNumbersArray[i]
-    return courseEnrolmentDictionary
+    return sortt(courseEnrolmentDictionary)
     
     
 
@@ -90,6 +90,27 @@ def getRidOfSemantics(line):
     line = line.replace("/","") 
     line = line.replace("Strong","") 
     return line
+
+def sortt(dictionary):
+    print("sorting")
+    aList = []
+    for key,value in dictionary.items():
+        aList.append([key,value])
+
+    i=0
+    while i < len(aList):
+        if "Faculty" in aList[i][0] or aList[i][1]=="":
+            aList.pop(i)
+            i-=1
+        i+=1
+
+    for i in range(len(aList)):
+        for x in range(len(aList)-2):
+            if int(aList[x][1]) < int(aList[x+1][1]):
+                temp = aList[x]
+                aList[x]=aList[x+1]
+                aList[x+1]=temp
+    return aList
 
 if __name__ == "__main__":
     crawl()
