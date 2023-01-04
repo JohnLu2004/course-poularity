@@ -64,11 +64,12 @@ class CourseList(generics.GenericAPIView):
 class CourseDetails(generics.RetrieveAPIView):
     serializer_class = CourseSerializer
 
-    def get(self, _, id):
+    def get(self, _, course_name):
         try:
+            
             # try to fetch the course
-            course = Course.objects.get(id=id)
-
+            course = ManuallyAddedCourse.objects.get(course_name=course_name)
+            
             # serialize the course
             serializer = self.serializer_class(course, many=False)
 
@@ -81,25 +82,40 @@ class CourseDetails(generics.RetrieveAPIView):
 
             # return the error
             return Response({"message": "Course not found."}, status=status.HTTP_404_NOT_FOUND)
-    def post(self, request):
+    def put(self,request,course_name):
+        print("putting")
         # process request data
         serializer = self.serializer_class(data=request.data)
-        print("\n \n \n")
-        print("okey dokey")
-        print("\n \n \n")
         if serializer.is_valid():
             # if the request data is valid, process the request
             data = serializer.validated_data
             print(data)
             
-            # create the course
-            ManuallyAddedCourse = ManuallyAddedCourse.objects.create(**data)
-
+            #create temp course
+            course = ManuallyAddedCourse.objects.update(data)
+            
             # serialize the questions
-            serializer = self.serializer_class(ManuallyAddedCourse, many=False)
+            serializer = self.serializer_class(ManuallyAddedCourse.objects.get(course_name=course_name), many=False)
 
             # return the result
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
+            print("rejected")
             # if you did not provide the required fields, return an error
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def delete(self, _, course_name):
+        try:
+            print("deleting")
+            # try to fetch the course
+            course = ManuallyAddedCourse.objects.get(course_name=course_name)
+            course.delete()
+
+            # return the serialized course
+            return Response("good", status=status.HTTP_200_OK)
+
+        except Course.DoesNotExist:
+            # return an error if the question does not exist
+            # error = ErrorSerializer()
+
+            # return the error
+            return Response({"message": "Course not found."}, status=status.HTTP_404_NOT_FOUND)

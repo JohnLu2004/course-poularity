@@ -7,7 +7,7 @@ urlpatterns = [
     path("", views.CourseList.as_view(), name="course-list"),
 
     # This returns a question
-    path("<int:id>/", views.CourseDetails.as_view() , name="course-view"),
+    path("<course_name>/", views.CourseDetails.as_view() , name="course-view"),
 ]
 
 
